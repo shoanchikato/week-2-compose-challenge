@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -444,7 +445,7 @@ fun TimerText(
 ) {
 
     val animatedColor by animateColorAsState(
-        if (isCurrentItem) Color.Black else Color.Black.copy(alpha = .2f)
+        if (isCurrentItem) MaterialTheme.colors.onBackground  else MaterialTheme.colors.onBackground.copy(alpha = .2f)
     )
     val animatedFontSize by animateIntAsState(if (isCurrentItem) 40 else 35)
 
