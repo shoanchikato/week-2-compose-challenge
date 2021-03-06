@@ -1,0 +1,126 @@
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 1c4a2c9..a728571 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -1,29 +1,31 @@[m
+[31m-# Template repository[m
+[32m+[m[32m# Put title of your app here[m
+ [m
+[31m-Template repository for the Jetpack Compose [#AndroidDevChallenge](https://developer.android.com/dev-challenge).[m
+[32m+[m[32m<!--- Replace <OWNER> with your Github Username and <REPOSITORY> with the name of your repository. -->[m
+[32m+[m[32m<!--- You can find both of these in the url bar when you open your repository in github. -->[m
+[32m+[m[32m![Workflow result](https://github.com/shoanchikato/week-2-compose-challenge/workflows/Check/badge.svg)[m
+ [m
+[31m-## Getting started[m
+[31m-Copy this repository by pressing the "Use this template" button in Github.[m
+[31m-Clone your repository and open it in the latest [Android Studio (Canary build)](https://developer.android.com/studio/preview).[m
+[32m+[m[32m## :scroll: Description[m
+ [m
+[31m-## Submission requirements[m
+[31m-- Follow the challenge description on the project website: [developer.android.com/dev-challenge](https://developer.android.com/dev-challenge)[m
+[31m-- All UI should be written using Jetpack Compose[m
+[31m-- The Github Actions workflow should complete successfully[m
+[31m-- Include two screenshots of your submission in the [results](results) folder. The names should be[m
+[31m-  screenshot_1.png and screenshot_2.png.[m
+[31m-- Include a screen record of your submission in the [results](results) folder. The name should be[m
+[31m-  video.mp4[m
+[31m-- Replace the contents of [README.md](README.md) with the contents of [README-template.md](README-template.md) and fill out the template.[m
+[32m+[m[32m<!--- Describe your app in one or two sentences -->[m
+[32m+[m[32mMinimalistic timer application that does one thing well, which is to let you know when the time is[m
+[32m+[m[32mup :)[m
+ [m
+[31m-## Code formatting[m
+[31m-The CI uses [Spotless](https://github.com/diffplug/spotless) to check if your code is formatted correctly and contains the right licenses.[m
+[31m-Internally, Spotless uses [ktlint](https://github.com/pinterest/ktlint) to check the formatting of your code.[m
+[31m-To set up ktlint correctly with Android Studio, follow one of the [listed setup options](https://github.com/pinterest/ktlint#-with-intellij-idea).[m
+[32m+[m[32m## :bulb: Motivation and Context[m
+ [m
+[31m-Before committing your code, run `./gradlew app:spotlessApply` to automatically format your code.[m
+[32m+[m[32m<!--- Optionally point readers to interesting parts of your submission. -->[m
+[32m+[m[32mUse fancy rotating wheel like numbers for inputting your hours, minutes or seconds to the timer.[m
+[32m+[m
+[32m+[m[32m<!--- What are you especially proud of? -->[m
+[32m+[m[32mClean and simple user interface.[m
+[32m+[m
+[32m+[m[32m## :camera_flash: Screenshots[m
+[32m+[m
+[32m+[m[32m<!-- You can add more screenshots here if you like -->[m
+[32m+[m[32m<img src="/results/screenshot_1.png" width="260">[m
+[32m+[m[32m&emsp;<img src="/results/screenshot_2.png" width="260">[m
+ [m
+ ## License[m
+[32m+[m
+ ```[m
+ Copyright 2020 The Android Open Source Project[m
+ [m
+[1mdiff --git a/app/src/main/java/com/example/androiddevchallenge/ui/screens/timerScreen/TimerScreen.kt b/app/src/main/java/com/example/androiddevchallenge/ui/screens/timerScreen/TimerScreen.kt[m
+[1mindex efb5826..eda490b 100644[m
+[1m--- a/app/src/main/java/com/example/androiddevchallenge/ui/screens/timerScreen/TimerScreen.kt[m
+[1m+++ b/app/src/main/java/com/example/androiddevchallenge/ui/screens/timerScreen/TimerScreen.kt[m
+[36m@@ -32,15 +32,7 @@[m [mimport androidx.compose.animation.core.animateIntAsState[m
+ import androidx.compose.foundation.background[m
+ import androidx.compose.foundation.border[m
+ import androidx.compose.foundation.clickable[m
+[31m-import androidx.compose.foundation.layout.Arrangement[m
+[31m-import androidx.compose.foundation.layout.Column[m
+[31m-import androidx.compose.foundation.layout.Row[m
+[31m-import androidx.compose.foundation.layout.Spacer[m
+[31m-import androidx.compose.foundation.layout.fillMaxHeight[m
+[31m-import androidx.compose.foundation.layout.fillMaxWidth[m
+[31m-import androidx.compose.foundation.layout.height[m
+[31m-import androidx.compose.foundation.layout.padding[m
+[31m-import androidx.compose.foundation.layout.size[m
+[32m+[m[32mimport androidx.compose.foundation.layout.*[m
+ import androidx.compose.foundation.lazy.LazyColumn[m
+ import androidx.compose.foundation.lazy.LazyListState[m
+ import androidx.compose.foundation.lazy.itemsIndexed[m
+[36m@@ -48,11 +40,7 @@[m [mimport androidx.compose.foundation.lazy.rememberLazyListState[m
+ import androidx.compose.foundation.shape.CircleShape[m
+ import androidx.compose.material.MaterialTheme[m
+ import androidx.compose.material.Text[m
+[31m-import androidx.compose.runtime.Composable[m
+[31m-import androidx.compose.runtime.getValue[m
+[31m-import androidx.compose.runtime.mutableStateOf[m
+[31m-import androidx.compose.runtime.remember[m
+[31m-import androidx.compose.runtime.setValue[m
+[32m+[m[32mimport androidx.compose.runtime.*[m
+ import androidx.compose.ui.Alignment[m
+ import androidx.compose.ui.Modifier[m
+ import androidx.compose.ui.draw.clip[m
+[36m@@ -66,14 +54,7 @@[m [mimport androidx.core.app.NotificationCompat[m
+ import androidx.core.app.NotificationManagerCompat[m
+ import com.example.androiddevchallenge.MainActivity[m
+ import com.example.androiddevchallenge.R[m
+[31m-import kotlinx.coroutines.CoroutineScope[m
+[31m-import kotlinx.coroutines.Dispatchers[m
+[31m-import kotlinx.coroutines.Job[m
+[31m-import kotlinx.coroutines.cancelChildren[m
+[31m-import kotlinx.coroutines.delay[m
+[31m-import kotlinx.coroutines.isActive[m
+[31m-import kotlinx.coroutines.launch[m
+[31m-import kotlinx.coroutines.withTimeout[m
+[32m+[m[32mimport kotlinx.coroutines.*[m
+ import kotlin.math.absoluteValue[m
+ import kotlin.math.ceil[m
+ [m
+[36m@@ -142,9 +123,10 @@[m [mfun TimerScreen() {[m
+ [m
+                     // on time out do the following:[m
+                     if (rawSeconds == 0) {[m
+[31m-                        setHaStarted(false)[m
+                         createNotificationChannel(context = context)[m
+                         displayNotification(context = context)[m
+[32m+[m[32m                        setHaStarted(false)[m
+[32m+[m[32m                        setHasReset(true)[m
+                     }[m
+ [m
+                     delay(1000)[m
+[1mdiff --git a/results/screenshot_1.png b/results/screenshot_1.png[m
+[1mindex 8df1d25..03bdd16 100644[m
+Binary files a/results/screenshot_1.png and b/results/screenshot_1.png differ
+[1mdiff --git a/results/screenshot_2.png b/results/screenshot_2.png[m
+[1mindex 8df1d25..bbd7764 100644[m
+Binary files a/results/screenshot_2.png and b/results/screenshot_2.png differ
+[1mdiff --git a/results/video.mp4 b/results/video.mp4[m
+[1mindex f4b0414..003d3fa 100644[m
+Binary files a/results/video.mp4 and b/results/video.mp4 differ

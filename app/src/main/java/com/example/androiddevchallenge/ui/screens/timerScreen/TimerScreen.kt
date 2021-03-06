@@ -142,9 +142,10 @@ fun TimerScreen() {
 
                     // on time out do the following:
                     if (rawSeconds == 0) {
-                        setHaStarted(false)
                         createNotificationChannel(context = context)
                         displayNotification(context = context)
+                        setHaStarted(false)
+                        setHasReset(true)
                     }
 
                     delay(1000)
