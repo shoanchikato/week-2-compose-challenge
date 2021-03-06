@@ -1,5 +1,15 @@
 package com.example.androiddevchallenge.ui.screens.timerScreen
 
+import android.annotation.SuppressLint
+import android.app.Notification.FLAG_AUTO_CANCEL
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.media.AudioAttributes
+import android.os.Build
+import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -19,10 +29,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.example.androiddevchallenge.MainActivity
+import com.example.androiddevchallenge.R
 import kotlinx.coroutines.*
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
@@ -34,6 +49,8 @@ const val MAX_SECONDS = 60
 const val INIT_LAZY_LIST_HOUR_INDEX = 5499
 const val INIT_LAZY_LIST_MINUTE_INDEX = 5459
 const val INIT_LAZY_LIST_SECOND_INDEX = 5459
+
+const val CHANNEL_ID = "CHANNEL_ID"
 
 object JobAndScope {
     val job = Job()
@@ -66,6 +83,8 @@ fun TimerScreen() {
                 + (minutes.toLong() * 60 * 1000)
                 + (seconds.toLong() * 1000))
 
+    val context = LocalContext.current
+
     val timer: (Long) -> Unit = { fullTime ->
 
         var mutableFullTime = fullTime
@@ -83,14 +102,21 @@ fun TimerScreen() {
                     seconds = (rawSeconds % 60).toString().padStart(2, '0')
                     minutes = ((rawSeconds / 60) % 60).toString().padStart(2, '0')
                     hours = ((rawSeconds / 60) / 60).toString().padStart(2, '0')
-                    if (rawSeconds == 0) setHaStarted(false)
+
+                    // on time out do the following:
+                    if (rawSeconds == 0) {
+                        setHaStarted(false)
+                        createNotificationChannel(context = context)
+                        displayNotification(context = context)
+                    }
+
                     delay(1000)
                 }
             }
         }
     }
 
-    var showCounterWheels = !hasStarted && hasReset
+    val showCounterWheels = !hasStarted && hasReset
 
     Column(
         modifier = Modifier
@@ -167,7 +193,7 @@ fun CounterInputWheels(
             .height(160.dp)
             .fillMaxWidth(.7f),
         verticalArrangement = Arrangement.SpaceBetween,
-    ){
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -186,6 +212,58 @@ fun CounterInputWheels(
             HourWheel(hourState)
             MinuteWheel(minuteState)
             SecondWheel(secondState)
+        }
+    }
+}
+
+fun createNotificationChannel(context: Context) {
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    with(context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Timer Notification Channel"
+            val descriptionText = "Timer Notification Channel"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val audioAttributes = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .build()
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+                setSound(Settings.System.DEFAULT_NOTIFICATION_URI, audioAttributes)
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+}
+
+@SuppressLint("UnspecifiedImmutableFlag")
+fun displayNotification(context: Context) {
+    with(context) {
+//        val randomId = (0..1000000).random()
+        val randomId = 0 // for single notification, use same id
+        val openAppIntent = Intent(this, MainActivity::class.java)
+        val openAppPendingIntent = PendingIntent.getActivity(this, 0,
+            openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.timer_icon)
+            .setContentTitle("Timer")
+            .setContentText("time is up :)")
+            .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
+            .setContentIntent(openAppPendingIntent)
+//            .setFullScreenIntent(fullScreenPendingIntent, true)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            builder.build()
+
+        with(NotificationManagerCompat.from(context)) {
+            // notificationId is a unique int for each notification that you must define
+            notify(randomId, builder.build().apply {
+                flags = FLAG_AUTO_CANCEL
+            })
         }
     }
 }
@@ -293,12 +371,12 @@ fun Button(
     }
 }
 
-private fun resetClock(lazyState: LazyListState, initValue: Int) {
-    val scope = CoroutineScope(Dispatchers.Main)
-    scope.launch {
-        lazyState.animateScrollToItem(initValue)
-    }
-}
+//private fun resetClock(lazyState: LazyListState, initValue: Int) {
+//    val scope = CoroutineScope(Dispatchers.Main)
+//    scope.launch {
+//        lazyState.animateScrollToItem(initValue)
+//    }
+//}
 
 private fun animateToClosestItem(lazyState: LazyListState) {
     val offset = lazyState.firstVisibleItemScrollOffset

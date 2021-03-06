@@ -18,6 +18,7 @@ package com.example.androiddevchallenge
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 // Start building your app here!
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TimerApp() {
     BodyContent(modifier = Modifier) {
